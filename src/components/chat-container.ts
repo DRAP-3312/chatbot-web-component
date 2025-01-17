@@ -1,4 +1,3 @@
-// chat-container.ts
 import { LitElement, css, html } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import "./chat-button.ts";
@@ -25,14 +24,17 @@ export class ChatContainer extends LitElement {
   apiPahtStartChat: string = "";
   @property({ type: String })
   apiPahtDeleteChat: string = "";
+  @property({type:String})
+  userName: string = ''
 
   render() {
     return html`
       <div class="container">
         <chat-form
           .isOpen="${this.isOpen}"
-          .startChat=${this.apiPahtStartChat}
-          .deleteChat=${this.apiPahtDeleteChat}
+          .pathStartChat=${this.apiPahtStartChat}
+          .pathDeleteChat=${this.apiPahtDeleteChat}
+          .userName=${this.userName}
         ></chat-form>
         <chat-button
           .content=${this.contentButton}
@@ -45,6 +47,5 @@ export class ChatContainer extends LitElement {
 
   toggleChat() {
     this.isOpen = !this.isOpen;
-    console.log("Estado del chat:", this.isOpen);
   }
 }

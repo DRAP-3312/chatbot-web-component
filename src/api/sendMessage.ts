@@ -2,9 +2,8 @@ import type { MessageResponse } from "../interfaces/messageResponse";
 import type { SendMessageInt } from "../interfaces/sendMessaga.interface";
 
 export const sendMessage = async (url: string, propm: SendMessageInt) => {
-  const apiEndPoit = url;
   try {
-    const res = await fetch(apiEndPoit, {
+    const res = await fetch(url, {
       method: "POST",
       body: JSON.stringify(propm),
       headers: {

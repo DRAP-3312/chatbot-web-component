@@ -11,17 +11,16 @@ export class ChatForm extends LitElement {
       position: absolute;
       bottom: 100%;
       right: 0;
-      background: white;
-      border-radius: 8px;
+      padding: 5px;
+      border-radius: 10px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       margin: 10px;
+      background-color: #f8f8f8f8;
       width: 80vw;
       height: 80vh;
       opacity: 0;
       transform: translateY(20px);
       display: none;
-
-      /* Estructura flex para mantener el textarea abajo */
       flex-direction: column;
     }
 
@@ -43,18 +42,18 @@ export class ChatForm extends LitElement {
 
     .board-message {
       flex: 1;
-      min-height: 0; /* Importante para que funcione el scroll */
+      min-height: 0;
       justify-content: center;
-      background-color: #f8f8f8f8;
+      background: white;
       border-radius: 10px;
       margin: 5px;
-      overflow: hidden; /* Para contener los mensajes */
+      overflow: hidden;
     }
 
     .form-send {
-      flex-shrink: 0; /* Evita que el área de input se encoja */
+      flex-shrink: 0;
       padding: 5px;
-      background: white;
+      border-radius: 10px;
     }
 
     form {
@@ -105,15 +104,31 @@ export class ChatForm extends LitElement {
         height: 60vh;
       }
     }
+
+    .btnDelete {
+      border-style: none;
+      width: auto;
+      height: auto;
+      color: red;
+      font-size: 2.5rem;
+      margin-right: 3px;
+      border-radius: 10px;
+    }
+
+    .btnDelete:hover {
+      color: #ee5858;
+    }
   `;
 
   @property({ type: Boolean })
   isOpen: boolean = false;
 
   @property({ type: String })
-  startChat: string = "";
+  pathStartChat: string = "";
   @property({ type: String })
-  deleteChat: string = "";
+  pathDeleteChat: string = "";
+  @property({ type: String })
+  userName: string = "";
 
   @state()
   message: string = "";
@@ -123,7 +138,7 @@ export class ChatForm extends LitElement {
     id: number;
     text: string;
     timestamp: Date;
-    type: "sent" | "received";
+    type: "sent" | "received" | "thinking";
   }> = [];
 
   render() {
@@ -160,19 +175,21 @@ export class ChatForm extends LitElement {
 
   private async onSendMessage(propms: SendMessageInt) {
     try {
-      const res = await sendMessage(this.startChat, propms);
+      const res = await sendMessage(this.pathStartChat, propms);
       if (res) {
-        console.log(res);
+        localStorage.setItem("idChat", res.idThread);
         return res;
       }
 
       console.error(res);
     } catch (error) {
       console.error(error);
+    } finally {
     }
   }
   private async _handleSubmit(e: Event) {
     e.preventDefault();
+
     if (this.message.trim()) {
       this.arrayMessages = [
         ...this.arrayMessages,
@@ -183,6 +200,15 @@ export class ChatForm extends LitElement {
           type: "sent",
         },
       ];
+      this.arrayMessages = [
+        ...this.arrayMessages,
+        {
+          id: Date.now() + 1,
+          text: "Pensando...",
+          timestamp: new Date(),
+          type: "thinking",
+        },
+      ];
 
       this.dispatchEvent(
         new CustomEvent("chat-message", {
@@ -190,33 +216,22 @@ export class ChatForm extends LitElement {
         })
       );
 
+      const idChat = localStorage.getItem("idChat");
       const res = await this.onSendMessage({
-        idThread: "",
+        idThread: idChat ?? "",
         promp: this.message,
-        userName: "paquito",
+        userName: this.userName,
       });
       this.message = "";
 
-      this.arrayMessages = [
-        ...this.arrayMessages,
-        {
-          id: Date.now(),
-          text: res?.messages[0].content[0].text.value ?? "No entendi",
+      this.arrayMessages = this.arrayMessages
+        .filter((msg) => msg.text !== "Pensando...")
+        .concat({
+          id: Date.now() + 2,
+          text: res?.messages[0].content[0].text.value ?? "No entendí",
           timestamp: new Date(),
           type: "received",
-        },
-      ];
-      // setTimeout(() => {
-      //   this.arrayMessages = [
-      //     ...this.arrayMessages,
-      //     {
-      //       id: Date.now(),
-      //       text: "Mensaje de respuesta automático",
-      //       timestamp: new Date(),
-      //       type: "received",
-      //     },
-      //   ];
-      // }, 1000);
+        });
     }
   }
 }
