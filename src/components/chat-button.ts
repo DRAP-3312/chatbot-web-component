@@ -8,16 +8,16 @@ export class ChatButton extends LitElement {
     .chat-button {
       width: auto;
       height: auto;
-      background-color: #7839cd;
+      background-color: #154360;
       color: white;
       border: none;
-      border-radius: 10px;
+      border-radius: 3px;
       cursor: pointer;
       color: white;
     }
 
     .chat-button:hover {
-      background-color: #8d75ac;
+      background-color: #313c58;
     }
 
     div {

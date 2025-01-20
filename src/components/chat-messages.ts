@@ -24,11 +24,12 @@ export class ChatMessages extends LitElement {
     .message {
       margin: 2px 0;
       padding: 6px 10px;
-      border-radius: 15px;
+      border-radius: 3px;
       max-width: 70%;
       min-width: 40px;
       height: fit-content;
       overflow-wrap: break-word;
+      font-family: Arial, Helvetica, sans-serif;
       word-break: break-word;
       white-space: pre-wrap;
       box-sizing: border-box;
@@ -43,19 +44,19 @@ export class ChatMessages extends LitElement {
     }
 
     .message-sent {
-      background-color: #7839cd;
+      background-color: #154360;
       color: white;
       margin-left: auto;
     }
 
     .message-received {
       background-color: #e9ecef;
-      color: #2c2c2c;
+      color: #767677;
       margin-right: auto;
     }
 
     .timestamp {
-      font-size: 0.65rem;
+      font-size: 8px;
       margin-top: 2px;
       opacity: 0.7;
       align-self: flex-end;
@@ -80,9 +81,9 @@ export class ChatMessages extends LitElement {
     }
 
     .loader {
-      width: 40px;
+      width: 30px;
       aspect-ratio: 2;
-      --_g: no-repeat radial-gradient(circle closest-side, #7839cd 90%, #0000);
+      --_g: no-repeat radial-gradient(circle closest-side, #154360 90%, #0000);
       background: var(--_g) 0% 50%, var(--_g) 50% 50%, var(--_g) 100% 50%;
       background-size: calc(100% / 3) 50%;
       animation: l3 1s infinite linear;
@@ -105,9 +106,9 @@ export class ChatMessages extends LitElement {
     .containerLoad {
       background-color: #e9ecef;
       padding: 6px 10px;
-      border-radius: 15px;
+      border-radius: 3px;
       max-width: 70%;
-      min-width: 40px;
+      min-width: 30px;
       margin-right: auto;
     }
   `;

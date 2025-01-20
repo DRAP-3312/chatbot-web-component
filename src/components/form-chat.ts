@@ -10,15 +10,16 @@ export class ChatForm extends LitElement {
     .chat-form {
       position: absolute;
       bottom: 100%;
-      right: 0;
+      left: 0;
       padding: 5px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 3px;
+      box-shadow: 0 0 10px rgba(0.2, 0.2, 0.2, 0.2);
       margin: 10px;
-      background-color: #f8f8f8f8;
+      background-color: white;
       width: 80vw;
       height: 80vh;
       opacity: 0;
+      font-family: Arial, Helvetica, sans-serif;
       transform: translateY(20px);
       display: none;
       flex-direction: column;
@@ -44,9 +45,9 @@ export class ChatForm extends LitElement {
       flex: 1;
       min-height: 0;
       justify-content: center;
-      background: white;
-      border-radius: 10px;
-      margin: 5px;
+      background: #f8f8f8f8;
+      border-radius: 3px;
+      margin: 0px 5px 5px 5px;
       overflow: hidden;
     }
 
@@ -68,12 +69,12 @@ export class ChatForm extends LitElement {
       min-height: 40px;
       max-height: 100px;
       padding: 8px 40px 8px 15px;
-      outline-color: #c2a0ee;
+      outline-color: #154360;
       font-size: 16px;
-      font-family: Arial, sans-serif;
+      font-family: Arial, Helvetica, sans-serif;
       color: #5a5959;
       border: 1px solid #ddd;
-      border-radius: 10px;
+      border-radius: 3px;
       resize: none;
       line-height: 1.2;
     }
@@ -83,19 +84,32 @@ export class ChatForm extends LitElement {
       right: 8px;
       bottom: 50%;
       transform: translateY(50%);
-      background: #7839cd;
+      background-color: #154360;
       color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 3px;
       padding: 6px 10px;
       font-size: 1rem;
-      cursor: pointer;
       opacity: 0;
       transition: opacity 0.3s ease;
     }
 
     .clear-button.show {
       opacity: 1;
+      cursor: pointer;
+    }
+
+    .welcome {
+      margin: 3px 5px 3px 5px;
+      padding: 0px 10px 0px 10px;
+      font-size: 16px;
+      color: white;
+      border-radius: 3px;
+      background-color: #154360;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     @media (min-width: 760px) {
@@ -118,6 +132,16 @@ export class ChatForm extends LitElement {
     .btnDelete:hover {
       color: #ee5858;
     }
+
+    .about {
+      background-color: white;
+      border-radius: 3px;
+      border-style: none;
+      height: auto;
+      width: auto;
+      padding: 1px;
+      cursor: pointer;
+    }
   `;
 
   @property({ type: Boolean })
@@ -129,6 +153,8 @@ export class ChatForm extends LitElement {
   pathDeleteChat: string = "";
   @property({ type: String })
   userName: string = "";
+  @property({ type: String })
+  welcomeName: string = "Test";
 
   @state()
   message: string = "";
@@ -143,7 +169,14 @@ export class ChatForm extends LitElement {
 
   render() {
     return html`
-      <div class="chat-form ${this.isOpen ? "open" : ""}">
+      <div
+        class="chat-form ${this.isOpen ? "open" : ""}"
+        @mousedown=${this._handleFormClick}
+      >
+        <div class="welcome">
+          <p>Bienvenido a ${this.welcomeName}!</p>
+          <button class="about" title="About">❕</button>
+        </div>
         <div class="board-message">
           <chat-messages .messages=${this.arrayMessages}></chat-messages>
         </div>
@@ -155,12 +188,13 @@ export class ChatForm extends LitElement {
               spellcheck="true"
               .value=${this.message}
               @input=${this._handleInput}
+              @keydown=${this._handleKeyDown}
             ></textarea>
             <button
               type="submit"
               class="clear-button ${this.message.trim() ? "show" : ""}"
             >
-              ↑
+            ↑
             </button>
           </form>
         </div>
@@ -187,15 +221,16 @@ export class ChatForm extends LitElement {
     } finally {
     }
   }
-  private async _handleSubmit(e: Event) {
-    e.preventDefault();
 
+  private async sendChatAction() {
     if (this.message.trim()) {
+      const newMessage = this.message;
+      this.message = "";
       this.arrayMessages = [
         ...this.arrayMessages,
         {
           id: Date.now(),
-          text: this.message.trim(),
+          text: newMessage.trim(),
           timestamp: new Date(),
           type: "sent",
         },
@@ -212,26 +247,61 @@ export class ChatForm extends LitElement {
 
       this.dispatchEvent(
         new CustomEvent("chat-message", {
-          detail: { message: this.message },
+          detail: { message: newMessage },
         })
       );
 
       const idChat = localStorage.getItem("idChat");
       const res = await this.onSendMessage({
         idThread: idChat ?? "",
-        promp: this.message,
+        promp: newMessage,
         userName: this.userName,
       });
-      this.message = "";
 
       this.arrayMessages = this.arrayMessages
         .filter((msg) => msg.text !== "Pensando...")
         .concat({
           id: Date.now() + 2,
-          text: res?.messages[0].content[0].text.value ?? "No entendí",
+          text:
+            res?.messages[0].content[0].text.value ??
+            "No pude procesar tu solicitud",
           timestamp: new Date(),
           type: "received",
         });
+    }
+  }
+  private async _handleSubmit(e: Event) {
+    e.preventDefault();
+    await this.sendChatAction();
+  }
+
+  // private closeFormOutSide = (e: MouseEvent) => {
+  //   const chatForm = this.shadowRoot?.querySelector(
+  //     ".chat-form"
+  //   ) as HTMLElement;
+  //   if (chatForm && !chatForm.contains(e.target as Node)) {
+  //     this.dispatchEvent(new CustomEvent("form-chat"));
+  //   }
+  // };
+
+  // updated(changedProperties: Map<string, any>) {
+  //   if (changedProperties.has("isOpen")) {
+  //     if (this.isOpen) {
+  //       document.addEventListener("mousedown", this.closeFormOutSide);
+  //     } else {
+  //       document.removeEventListener("mousedown", this.closeFormOutSide);
+  //     }
+  //   }
+  // }
+
+  private _handleFormClick(e: MouseEvent) {
+    e.stopPropagation();
+  }
+
+  private async _handleKeyDown(e: KeyboardEvent) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      await this.sendChatAction();
     }
   }
 }

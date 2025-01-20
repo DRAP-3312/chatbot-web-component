@@ -8,7 +8,7 @@ export class ChatContainer extends LitElement {
   static styles = css`
     .container {
       position: fixed;
-      right: 20px;
+      left: 20px;
       bottom: 20px;
       z-index: 1000;
     }
@@ -19,13 +19,17 @@ export class ChatContainer extends LitElement {
 
   @property({ type: String })
   contentButton: string = "chat";
+  @property({ type: Boolean })
+  chatModal: boolean = false;
 
   @property({ type: String })
   apiPahtStartChat: string = "";
   @property({ type: String })
   apiPahtDeleteChat: string = "";
-  @property({type:String})
-  userName: string = ''
+  @property({ type: String })
+  userName: string = "";
+  @property({ type: String })
+  welcomeName: string = "";
 
   render() {
     return html`
@@ -35,6 +39,8 @@ export class ChatContainer extends LitElement {
           .pathStartChat=${this.apiPahtStartChat}
           .pathDeleteChat=${this.apiPahtDeleteChat}
           .userName=${this.userName}
+          .welcomeName=${this.welcomeName}
+          @form-chat=${this.closeModalChat}
         ></chat-form>
         <chat-button
           .content=${this.contentButton}
@@ -47,5 +53,9 @@ export class ChatContainer extends LitElement {
 
   toggleChat() {
     this.isOpen = !this.isOpen;
+  }
+
+  closeModalChat() {
+    this.isOpen = false;
   }
 }
