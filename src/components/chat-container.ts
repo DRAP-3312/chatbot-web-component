@@ -18,7 +18,7 @@ export class ChatContainer extends LitElement {
   isOpen: boolean = false;
 
   @property({ type: String })
-  contentButton: string = "chat";
+  contentButton: string = "❉";
   @property({ type: Boolean })
   chatModal: boolean = false;
 
