@@ -3,12 +3,18 @@ import { defineConfig } from "vite";
 export default defineConfig({
   build: {
     lib: {
-      entry: "src/index.ts", // Este será nuestro punto de entrada
-      formats: ["es"], // Generaremos módulos ES
-      fileName: "index", // Nombre del archivo de salida
+      entry: "src/index.ts", // Asegúrate que esta ruta sea correcta
+      formats: ["es", "umd"],
+      name: "ChatTs",
+      fileName: (format) => `chat-ts.${format}.js`,
     },
     rollupOptions: {
-      external: /^lit/, // Excluimos lit del bundle final
+      external: ["lit"],
+      output: {
+        globals: {
+          lit: "Lit",
+        },
+      },
     },
   },
 });
