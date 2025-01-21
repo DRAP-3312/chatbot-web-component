@@ -1,8 +1,10 @@
-import { LitElement, css, html } from "lit";
+import { LitElement, PropertyValues, css, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import "./chat-messages";
 import { sendMessage } from "../api/sendMessage";
 import type { SendMessageInt } from "../interfaces/sendMessaga.interface";
+import type { MessageCustomStyle } from "../interfaces/styles/messageCustomStyle";
+import type { FormCustomStyle } from "../interfaces/styles/formCustomStyle";
 
 @customElement("chat-form")
 export class ChatForm extends LitElement {
@@ -15,7 +17,7 @@ export class ChatForm extends LitElement {
       border-radius: 3px;
       box-shadow: 0 0 10px rgba(0.2, 0.2, 0.2, 0.2);
       margin: 10px;
-      background-color: white;
+      background-color: var(--form-bg-color);
       width: 80vw;
       height: 80vh;
       opacity: 0;
@@ -45,7 +47,7 @@ export class ChatForm extends LitElement {
       flex: 1;
       min-height: 0;
       justify-content: center;
-      background: #f8f8f8f8;
+      background: var(--form-bg-color-board);
       border-radius: 3px;
       margin: 0px 5px 5px 5px;
       overflow: hidden;
@@ -69,14 +71,16 @@ export class ChatForm extends LitElement {
       min-height: 40px;
       max-height: 100px;
       padding: 8px 40px 8px 15px;
-      outline-color: #154360;
+      outline-color: var(--form-color-outline-text-area);
       font-size: 16px;
       font-family: Arial, Helvetica, sans-serif;
-      color: #5a5959;
+      color: var(--form-text-color);
       border: 1px solid #ddd;
       border-radius: 3px;
+      background-color: var(--form-bg-color-text-area);
       resize: none;
       line-height: 1.2;
+      text-align: justify;
     }
 
     .clear-button {
@@ -84,8 +88,8 @@ export class ChatForm extends LitElement {
       right: 8px;
       bottom: 50%;
       transform: translateY(50%);
-      background-color: #154360;
-      color: white;
+      background-color: var(--form-bg-color-button);
+      color: var(--form-color-text-button);
       border: none;
       border-radius: 3px;
       padding: 6px 10px;
@@ -103,9 +107,9 @@ export class ChatForm extends LitElement {
       margin: 3px 5px 3px 5px;
       padding: 0px 10px 0px 10px;
       font-size: 16px;
-      color: white;
+      color: var(--form-color-text-head);
       border-radius: 3px;
-      background-color: #154360;
+      background-color: var(--form-bg-color-head);
       font-weight: bold;
       display: flex;
       justify-content: space-between;
@@ -156,6 +160,45 @@ export class ChatForm extends LitElement {
   @property({ type: String })
   welcomeName: string = "Test";
 
+  //props custom style form
+  @property({ type: Object })
+  configFormStyle: FormCustomStyle = {
+    form_bg_color: "",
+    form_bg_color_board: "",
+    form_bg_color_button: "",
+    form_bg_color_head: "",
+    form_bg_color_text_area: "",
+    form_color_outline_text_area: "",
+    form_color_text_button: "",
+    form_color_text_head: "",
+    form_text_color: "",
+  };
+
+  //mapeo props custom style
+  private cssProperties: Record<string, string> = {
+    form_bg_color: "--form-bg-color",
+    form_text_color: "--form-text-color",
+    form_bg_color_board: "--form-bg-color-board",
+    form_bg_color_head: "--form-bg-color-head",
+    form_color_text_head: "--form-color-text-head",
+    form_bg_color_button: "--form-bg-color-button",
+    form_color_text_button: "--form-color-text-button",
+    form_color_outline_text_area: "--form-color-outline-text-area",
+    form_bg_color_text_area: "--form-bg-color-text-area",
+  };
+
+  //props para message
+  @property({ type: Object })
+  configMessageStyle: MessageCustomStyle = {
+    message_bg_color_loading: "",
+    message_bg_color_received: "",
+    message_bg_color_sender: "",
+    message_color_text_loading: "",
+    message_color_text_received: "",
+    message_color_text_sender: "",
+    message_text_color_datetime: "",
+  };
+
   @state()
   message: string = "";
 
@@ -178,7 +221,10 @@ export class ChatForm extends LitElement {
           <button class="about" title="About">❕</button>
         </div>
         <div class="board-message">
-          <chat-messages .messages=${this.arrayMessages}></chat-messages>
+          <chat-messages
+            .messages=${this.arrayMessages}
+            .configMessageStyle=${this.configMessageStyle}
+          ></chat-messages>
         </div>
         <div class="form-send">
           <form @submit="${this._handleSubmit}">
@@ -194,12 +240,22 @@ export class ChatForm extends LitElement {
               type="submit"
               class="clear-button ${this.message.trim() ? "show" : ""}"
             >
-            ↑
+              ↑
             </button>
           </form>
         </div>
       </div>
     `;
+  }
+
+  //watch changes custom styles
+  protected willUpdate(changedProperties: PropertyValues<this>) {
+    if (changedProperties.has("configFormStyle")) {
+      Object.entries(this.cssProperties).forEach(([prop, cssVar]) => {
+        const value = this.configFormStyle[prop as keyof FormCustomStyle];
+        this.style.setProperty(cssVar, value);
+      });
+    }
   }
 
   private _handleInput(e: Event) {

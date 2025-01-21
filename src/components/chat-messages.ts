@@ -1,5 +1,6 @@
-import { LitElement, css, html } from "lit";
+import { LitElement, PropertyValues, css, html } from "lit";
 import { customElement, property } from "lit/decorators.js";
+import type { MessageCustomStyle } from "../interfaces/styles/messageCustomStyle";
 
 interface Message {
   id: number;
@@ -35,6 +36,7 @@ export class ChatMessages extends LitElement {
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
+      text-align: justify;
     }
 
     .message-content {
@@ -44,14 +46,14 @@ export class ChatMessages extends LitElement {
     }
 
     .message-sent {
-      background-color: #154360;
-      color: white;
+      background-color: var(--message-bg-color-sender);
+      color: var(--message-color-text-sender);
       margin-left: auto;
     }
 
     .message-received {
-      background-color: #e9ecef;
-      color: #767677;
+      background-color: var(--message-bg-color-received);
+      color: var(--message-color-text-received);
       margin-right: auto;
     }
 
@@ -60,6 +62,7 @@ export class ChatMessages extends LitElement {
       margin-top: 2px;
       opacity: 0.7;
       align-self: flex-end;
+      color: var(--message-text-color-datetime);
     }
 
     .message.short {
@@ -83,7 +86,12 @@ export class ChatMessages extends LitElement {
     .loader {
       width: 30px;
       aspect-ratio: 2;
-      --_g: no-repeat radial-gradient(circle closest-side, #154360 90%, #0000);
+      --_g: no-repeat
+        radial-gradient(
+          circle closest-side,
+          var(--message-color-text-loading) 90%,
+          #0000
+        );
       background: var(--_g) 0% 50%, var(--_g) 50% 50%, var(--_g) 100% 50%;
       background-size: calc(100% / 3) 50%;
       animation: l3 1s infinite linear;
@@ -104,7 +112,7 @@ export class ChatMessages extends LitElement {
     }
 
     .containerLoad {
-      background-color: #e9ecef;
+      background-color: var(--message-bg-color-loading);
       padding: 6px 10px;
       border-radius: 3px;
       max-width: 70%;
@@ -115,6 +123,29 @@ export class ChatMessages extends LitElement {
 
   @property({ type: Array })
   messages: Message[] = [];
+
+  //props style messages
+  @property({ type: Object })
+  configMessageStyle: MessageCustomStyle = {
+    message_bg_color_loading: "",
+    message_bg_color_received: "",
+    message_bg_color_sender: "",
+    message_color_text_loading: "",
+    message_color_text_received: "",
+    message_color_text_sender: "",
+    message_text_color_datetime: "",
+  };
+
+  //mapeo props custom style
+  private cssProperties: Record<string, string> = {
+    message_bg_color_sender: "--message-bg-color-sender",
+    message_color_text_sender: "--message-color-text-sender",
+    message_bg_color_received: "--message-bg-color-received",
+    message_color_text_received: "--message-color-text-received",
+    message_text_color_datetime: "--message-text-color-datetime",
+    message_bg_color_loading: "--message-bg-color-loading",
+    message_color_text_loading: "--message-color-text-loading",
+  };
 
   render() {
     return html`
@@ -141,6 +172,16 @@ export class ChatMessages extends LitElement {
         )}
       </div>
     `;
+  }
+
+  //watch changes custom styles
+  protected willUpdate(changedProperties: PropertyValues<this>) {
+    if (changedProperties.has("configMessageStyle")) {
+      Object.entries(this.cssProperties).forEach(([prop, cssVar]) => {
+        const value = this.configMessageStyle[prop as keyof MessageCustomStyle];
+        this.style.setProperty(cssVar, value);
+      });
+    }
   }
 
   scrollToBottom() {
