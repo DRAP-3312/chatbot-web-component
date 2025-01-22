@@ -37,6 +37,14 @@ export class ChatMessages extends LitElement {
       display: flex;
       flex-direction: column;
       text-align: justify;
+      transform: translateY(-4px);
+      transition: all 0.2s ease-in-out;
+    }
+
+    .message:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.07), 0 4px 8px rgba(0, 0, 0, 0.07),
+        0 8px 16px rgba(0, 0, 0, 0.07), 0 16px 32px rgba(0, 0, 0, 0.07);
     }
 
     .message-content {
@@ -118,6 +126,14 @@ export class ChatMessages extends LitElement {
       max-width: 70%;
       min-width: 30px;
       margin-right: auto;
+      transform: translateY(-4px);
+      transition: all 0.2s ease-in-out;
+    }
+
+    .containerLoad:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.07), 0 4px 8px rgba(0, 0, 0, 0.07),
+        0 8px 16px rgba(0, 0, 0, 0.07), 0 16px 32px rgba(0, 0, 0, 0.07);
     }
   `;
 

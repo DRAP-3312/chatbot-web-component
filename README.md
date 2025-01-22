@@ -60,22 +60,84 @@ Todos estos atributos son necesarios para el funcionamiento del componente:
 ```html
 <chat-container
   content-button="❉"
-  api-paht-start-chat="http://localhost:3000/api/openai/assistant"
-  api-paht-delete-chat="http://localhost:3000/api/openai/thread"
+  api-paht-start-chat="http://api"
+  api-paht-delete-chat="http://api"
   user-name="Drap"
   welcome-name="Saguaro APP"
 ></chat-container>
 ```
 
-| Atributo             | Descripción                              |
-| -------------------- | ---------------------------------------- |
-| content-button       | Ícono o texto para el botón del chat     |
-| api-paht-start-chat  | URL del endpoint para iniciar el chat    |
-| api-paht-delete-chat | URL del endpoint para eliminar el chat   |
-| user-name            | Nombre del usuario en el chat            |
-| welcome-name         | Nombre de bienvenida mostrado en el chat |
+### Estilos personalizados disponibles
 
-## Notas Importantes
+```html
+<chat-container
+  .configFormStyle="{
+    form_bg_color: '#ffffff',
+    form_bg_color_board: '#f8f8f8f8',
+    form_bg_color_button: '#154360',
+    form_bg_color_head: '#154360',
+    form_color_outline_text_area: '#154360',
+    form_color_text_button: '#ffffff',
+    form_color_text_head: '#ffffff',
+    form_text_color: '#3c3b3b',
+    form_bg_color_text_area: '#ffffff'
+  }"
+  .configMessageStyle="{
+    message_bg_color_loading: '#e9ecef',
+    message_bg_color_received: '#e9ecef',
+    message_bg_color_sender: '#154360',
+    message_color_text_loading: '#154360',
+    message_color_text_received: '#767677',
+    message_color_text_sender: '#ffffff',
+    message_text_color_datetime: '#e9ecef'
+  }"
+  .configButtonStyle="{
+    botton_bg_color: '#154360',
+    button_color_text: '#ffffff',
+    button_hover_color: '#313c58'
+  }"
+></chat-container>
+```
 
-- Las URLs de API mostradas son ejemplos locales. Debes proporcionar tus propias rutas de API cuando implementes el componente.
-- La personalización de estilos está actualmente en desarrollo y se agregará en futuras versiones.
+| Atributo | Descripción |
+|----------|-------------|
+| content-button | Ícono o texto para el botón del chat |
+| api-paht-start-chat | URL del endpoint para iniciar el chat |
+| api-paht-delete-chat | URL del endpoint para eliminar el chat |
+| user-name | Nombre del usuario en el chat |
+| welcome-name | Nombre de bienvenida mostrado en el chat |
+| configFormStyle | Objeto de configuración para estilos del formulario |
+| configMessageStyle | Objeto de configuración para estilos de los mensajes |
+| configButtonStyle | Objeto de configuración para estilos del botón |
+
+### Estilos Personalizables
+#### configFormStyle
+| Propiedad | Descripción |
+|-----------|-------------|
+| form_bg_color | Color de fondo del formulario |
+| form_bg_color_board | Color de fondo del tablero |
+| form_bg_color_button | Color de fondo del botón |
+| form_bg_color_head | Color de fondo del encabezado |
+| form_color_outline_text_area | Color del contorno del área de texto |
+| form_color_text_button | Color del texto del botón |
+| form_color_text_head | Color del texto del encabezado |
+| form_text_color | Color del texto general |
+| form_bg_color_text_area | Color de fondo del área de texto |
+
+#### configMessageStyle
+| Propiedad | Descripción |
+|-----------|-------------|
+| message_bg_color_loading | Color de fondo durante la carga |
+| message_bg_color_received | Color de fondo de mensajes recibidos |
+| message_bg_color_sender | Color de fondo de mensajes enviados |
+| message_color_text_loading | Color del texto durante la carga |
+| message_color_text_received | Color del texto de mensajes recibidos |
+| message_color_text_sender | Color del texto de mensajes enviados |
+| message_text_color_datetime | Color del texto de fecha y hora |
+
+#### configButtonStyle
+| Propiedad | Descripción |
+|-----------|-------------|
+| botton_bg_color | Color de fondo del botón |
+| button_color_text | Color del texto del botón |
+| button_hover_color | Color del botón al pasar el cursor |
