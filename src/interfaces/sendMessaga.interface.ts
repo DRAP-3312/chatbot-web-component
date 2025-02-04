@@ -1,5 +1,5 @@
 export interface SendMessageInt {
   idThread: string;
-  promp: string;
-  userName: string;
+  message: string;
+  idConfig: string;
 }

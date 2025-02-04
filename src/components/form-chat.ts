@@ -128,8 +128,8 @@ export class ChatForm extends LitElement {
 
     @media (min-width: 760px) {
       .chat-form {
-        width: 40vw;
-        height: 60vh;
+        width: 50vw;
+        height: 70vh;
       }
     }
 
@@ -208,6 +208,9 @@ export class ChatForm extends LitElement {
     message_color_text_sender: "",
     message_text_color_datetime: "",
   };
+
+  @property({ type: String })
+  idConfig: string = "";
 
   @state()
   message: string = "";
@@ -320,8 +323,8 @@ export class ChatForm extends LitElement {
       const idChat = localStorage.getItem("idChat");
       const res = await this.onSendMessage({
         idThread: idChat ?? "",
-        promp: newMessage,
-        userName: this.userName,
+        message: newMessage,
+        idConfig: this.idConfig,
       });
 
       this.arrayMessages = this.arrayMessages

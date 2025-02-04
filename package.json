@@ -1,6 +1,6 @@
 {
   "name": "chat-ts",
-  "version": "1.2.5",
+  "version": "1.4.0",
   "type": "module",
   "description": "prueba web component chatbot practica",
   "author": {
@@ -26,7 +26,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "lit": "^3.2.1"
+    "lit": "^3.2.1",
+    "lit-html": "^3.2.1"
   },
   "devDependencies": {
     "typescript": "~5.6.2",

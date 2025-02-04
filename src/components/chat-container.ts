@@ -66,10 +66,14 @@ export class ChatContainer extends LitElement {
     button_hover_color: "#313c58",
   };
 
+  @property({ type: String })
+  idConfig: string = "";
+
   render() {
     return html`
       <div class="container">
         <chat-form
+          .idConfig="${this.idConfig}"
           .isOpen="${this.isOpen}"
           .pathStartChat=${this.apiPahtStartChat}
           .pathDeleteChat=${this.apiPahtDeleteChat}

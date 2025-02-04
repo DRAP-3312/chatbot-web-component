@@ -1,6 +1,7 @@
 import { LitElement, PropertyValues, css, html } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import type { MessageCustomStyle } from "../interfaces/styles/messageCustomStyle";
+import { unsafeHTML } from "lit/directives/unsafe-html.js";
 
 interface Message {
   id: number;
@@ -12,19 +13,9 @@ interface Message {
 @customElement("chat-messages")
 export class ChatMessages extends LitElement {
   static styles = css`
-    .messages-container {
-      height: 100%;
-      overflow-y: auto;
-      padding: 8px;
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      box-sizing: border-box;
-    }
-
     .message {
       margin: 2px 0;
-      padding: 6px 10px;
+      padding: 5px 10px;
       border-radius: 3px;
       max-width: 70%;
       min-width: 40px;
@@ -32,13 +23,23 @@ export class ChatMessages extends LitElement {
       overflow-wrap: break-word;
       font-family: Arial, Helvetica, sans-serif;
       word-break: break-word;
-      white-space: pre-wrap;
+
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
       text-align: justify;
       transform: translateY(-4px);
       transition: all 0.2s ease-in-out;
+    }
+
+    .messages-container {
+      height: 100%;
+      overflow-y: auto;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      width: auto;
+      box-sizing: border-box;
     }
 
     .message:hover {
@@ -49,8 +50,9 @@ export class ChatMessages extends LitElement {
 
     .message-content {
       width: 100%;
-      line-height: 1.2;
+      line-height: 1;
       margin: 0;
+      text-align: justify;
     }
 
     .message-sent {
@@ -63,6 +65,7 @@ export class ChatMessages extends LitElement {
       background-color: var(--message-bg-color-received);
       color: var(--message-color-text-received);
       margin-right: auto;
+      
     }
 
     .timestamp {
@@ -71,14 +74,6 @@ export class ChatMessages extends LitElement {
       opacity: 0.7;
       align-self: flex-end;
       color: var(--message-text-color-datetime);
-    }
-
-    .message.short {
-      padding: 4px 8px;
-    }
-
-    .message.short .message-content {
-      line-height: 1.1;
     }
 
     @media (max-width: 480px) {
@@ -135,10 +130,108 @@ export class ChatMessages extends LitElement {
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.07), 0 4px 8px rgba(0, 0, 0, 0.07),
         0 8px 16px rgba(0, 0, 0, 0.07), 0 16px 32px rgba(0, 0, 0, 0.07);
     }
+
+    .message-content a {
+      color: var(--message-bg-color-sender);
+      text-decoration: underline;
+      word-break: break-word;
+    }
+
+    .message-content a:hover {
+      opacity: 0.8;
+    }
+
+    .message-content h4 {
+      font-size: 1.2em;
+      margin: 0.5em 0;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+    .message-content .image-container {
+      margin: 8px 0;
+      max-width: 100%;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .message-content .image-container img {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: cover;
+    }
+
+    .message-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin: 4px 0;
+    }
+
+    /* Estilo para cuando la imagen está cargando */
+    .message-content img.loading {
+      background-color: #f0f0f0;
+      min-height: 200px;
+    }
+
+    /* Animación de carga suave */
+    .message-content img {
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+    }
+
+    .message-content img.loaded {
+      opacity: 1;
+    }
+    .link-preview {
+      margin: 8px 0;
+      width: 100%;
+    }
+
+    .preview-container {
+      display: flex;
+      padding: 12px;
+      background-color: rgba(0, 0, 0, 0.05);
+      border-radius: 8px;
+      text-decoration: none;
+      color: inherit;
+      align-items: center;
+      gap: 12px;
+      transition: background-color 0.2s ease;
+    }
+
+    .preview-container:hover {
+      background-color: rgba(0, 0, 0, 0.08);
+    }
+
+    .preview-content {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .preview-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .preview-url {
+      font-size: 0.9em;
+      opacity: 0.7;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .preview-icon {
+      flex-shrink: 0;
+      opacity: 0.7;
+    }
   `;
 
   @property({ type: Array })
   messages: Message[] = [];
+
+  //white-space: pre-wrap;
 
   //props style messages
   @property({ type: Object })
@@ -163,11 +256,62 @@ export class ChatMessages extends LitElement {
     message_color_text_loading: "--message-color-text-loading",
   };
 
+  private linkify(text: string): string {
+    // Limpiamos las referencias del texto
+    const cleanText = text.replace(/\[\d+\.?\d*(?:↑source↓|source)\]/g, "");
+
+    // Procesamos los encabezados
+    const withHeaders = cleanText.replace(/^### (.+)$/gm, "<h2>$1</h2>");
+
+    // Procesamos el texto en negrita
+    const boldText = withHeaders.replace(
+      /\*\*(.*?)\*\*/g,
+      "<strong>$1</strong>"
+    );
+
+    // Procesamos las URLs con vista previa
+    const urlRegex =
+      /(https?:\/\/[^\s()<>[\]{}]+(?:\([^\s()<>[\]{}]*\)|[^\s`!()\[\]{};:'".,<>?«»""'']))/g;
+
+    return boldText.replace(urlRegex, (url) => {
+      try {
+        const cleanUrl = url.replace(/[).,;:]+$/, "");
+        new URL(cleanUrl);
+
+        // Si es una imagen, la mostramos directamente
+        if (/\.(jpg|jpeg|png|gif|webp)$/i.test(cleanUrl)) {
+          return `<div class="image-container"><img src="${cleanUrl}" alt="Image" loading="lazy" /></div>`;
+        }
+
+        // Para otros enlaces, mostramos una vista previa
+        return `
+          <div class="link-preview">
+            <a href="${cleanUrl}" target="_blank" rel="noopener noreferrer" class="preview-container">
+              <div class="preview-content">
+                <div class="preview-title">${new URL(cleanUrl).hostname}</div>
+                <div class="preview-url">${cleanUrl}</div>
+              </div>
+              <div class="preview-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+              </div>
+            </a>
+          </div>`;
+      } catch {
+        return url;
+      }
+    });
+  }
+
   render() {
     return html`
       <div class="messages-container">
-        ${this.messages.map(
-          (message) => html`
+        ${this.messages.map((message) => {
+          const messageText = message.text ? this.linkify(message.text) : "";
+          return html`
             ${message.type === "thinking"
               ? html`<div class="containerLoad">
                   <div class="loader"></div>
@@ -178,14 +322,16 @@ export class ChatMessages extends LitElement {
                       ? "message-sent"
                       : "message-received"}"
                   >
-                    <div class="message-content">${message.text}</div>
+                    <div class="message-content">
+                      ${unsafeHTML(messageText)}
+                    </div>
                     <div class="timestamp">
                       ${new Date(message.timestamp).toLocaleTimeString()}
                     </div>
                   </div>
                 `}
-          `
-        )}
+          `;
+        })}
       </div>
     `;
   }
@@ -210,7 +356,22 @@ export class ChatMessages extends LitElement {
     }
   }
 
-  updated() {
+  updated(changedProperties: PropertyValues<this>) {
     this.scrollToBottom();
+    super.updated(changedProperties);
+    this.scrollToBottom();
+    this.addImageLoadHandlers();
+  }
+
+  private addImageLoadHandlers() {
+    const images = this.shadowRoot?.querySelectorAll(".message-content img");
+    images?.forEach((img: any) => {
+      img.addEventListener("load", () => {
+        img.classList.add("loaded");
+      });
+      img.addEventListener("error", () => {
+        img.style.display = "none";
+      });
+    });
   }
 }
