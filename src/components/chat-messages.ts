@@ -65,7 +65,6 @@ export class ChatMessages extends LitElement {
       background-color: var(--message-bg-color-received);
       color: var(--message-color-text-received);
       margin-right: auto;
-      
     }
 
     .timestamp {
@@ -123,6 +122,7 @@ export class ChatMessages extends LitElement {
       margin-right: auto;
       transform: translateY(-4px);
       transition: all 0.2s ease-in-out;
+      display: flex;
     }
 
     .containerLoad:hover {
@@ -226,6 +226,11 @@ export class ChatMessages extends LitElement {
       flex-shrink: 0;
       opacity: 0.7;
     }
+    .message-content br {
+      display: block;
+      margin: 8px 0;
+      content: "";
+    }
   `;
 
   @property({ type: Array })
@@ -257,11 +262,13 @@ export class ChatMessages extends LitElement {
   };
 
   private linkify(text: string): string {
-    // Limpiamos las referencias del texto
-    const cleanText = text.replace(/\[\d+\.?\d*(?:↑source↓|source)\]/g, "");
+    // Reemplazamos tanto \n como saltos de línea reales
+    const withLineBreaks = text
+      .replace(/\\n/g, "<br>") // Reemplaza \n
+      .replace(/\n/g, "<br>"); // Reemplaza saltos de línea reales
 
     // Procesamos los encabezados
-    const withHeaders = cleanText.replace(/^### (.+)$/gm, "<h2>$1</h2>");
+    const withHeaders = withLineBreaks.replace(/^### (.+)$/gm, "<h4>$1</h4>");
 
     // Procesamos el texto en negrita
     const boldText = withHeaders.replace(
@@ -305,7 +312,6 @@ export class ChatMessages extends LitElement {
       }
     });
   }
-
   render() {
     return html`
       <div class="messages-container">
@@ -314,6 +320,7 @@ export class ChatMessages extends LitElement {
           return html`
             ${message.type === "thinking"
               ? html`<div class="containerLoad">
+                ✨
                   <div class="loader"></div>
                 </div>`
               : html`

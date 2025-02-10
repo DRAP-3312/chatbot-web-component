@@ -12,7 +12,7 @@ export class ChatButton extends LitElement {
       background-color: var(--botton-bg-color);
       color: var(--button-color-text);
       border: none;
-      border-radius: 3px;
+      border-radius: 10px;
       cursor: pointer;
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.07),
         0 4px 8px rgba(0, 0, 0, 0.07), 0 8px 16px rgba(0, 0, 0, 0.07);
@@ -50,7 +50,7 @@ export class ChatButton extends LitElement {
 
   render() {
     return html`
-      <button class="chat-button" @click="${this._handleClick}">
+      <button class="chat-button" title="Asistente" @click="${this._handleClick}">
         <div>${this.content}</div>
       </button>
     `;

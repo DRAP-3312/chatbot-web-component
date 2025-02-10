@@ -5,6 +5,8 @@ import { sendMessage } from "../api/sendMessage";
 import type { SendMessageInt } from "../interfaces/sendMessaga.interface";
 import type { MessageCustomStyle } from "../interfaces/styles/messageCustomStyle";
 import type { FormCustomStyle } from "../interfaces/styles/formCustomStyle";
+import { loadConversation } from "../api/loadConversation";
+import { ArrayMessageInterface } from "../interfaces/arrayMessage.interface";
 
 @customElement("chat-form")
 export class ChatForm extends LitElement {
@@ -103,9 +105,29 @@ export class ChatForm extends LitElement {
       cursor: pointer;
     }
 
+    .clear-button.disable {
+      opacity: 0.5;
+    }
+
+    .welcome-container {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 0.3rem;
+    }
+
+    .welcome-container p {
+      font-family: Verdana, Geneva, Tahoma, sans-serif;
+      font-size: 1rem;
+      font-weight: lighter;
+    }
+
     .welcome {
       margin: 3px 5px 3px 5px;
       padding: 0px 10px 0px 10px;
+      width: 40%;
+      height: 40px;
       font-size: 16px;
       color: var(--form-color-text-head);
       border-radius: 3px;
@@ -120,10 +142,10 @@ export class ChatForm extends LitElement {
       transition: all 0.2s ease-in-out;
     }
 
-    .welcome:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.07), 0 4px 8px rgba(0, 0, 0, 0.07),
-        0 8px 16px rgba(0, 0, 0, 0.07), 0 16px 32px rgba(0, 0, 0, 0.07);
+    @media (max-width: 1024px) {
+      .welcome {
+        width: 100%;
+      }
     }
 
     @media (min-width: 760px) {
@@ -131,6 +153,11 @@ export class ChatForm extends LitElement {
         width: 50vw;
         height: 70vh;
       }
+    }
+
+    .action-container {
+      display: flex;
+      gap: 2px;
     }
 
     .btnDelete {
@@ -147,14 +174,20 @@ export class ChatForm extends LitElement {
       color: #ee5858;
     }
 
-    .about {
+    .actions {
       background-color: white;
       border-radius: 3px;
       border-style: none;
+      font-size: 1rem;
       height: auto;
       width: auto;
       padding: 1px;
       cursor: pointer;
+    }
+
+    .actions:hover {
+      transform: translateY(-2px);
+      background-color: #e5e5e5;
     }
   `;
 
@@ -212,26 +245,40 @@ export class ChatForm extends LitElement {
   @property({ type: String })
   idConfig: string = "";
 
+  @property({ type: String })
+  apiLoadMessages: string = "";
+
   @state()
   message: string = "";
 
   @state()
-  arrayMessages: Array<{
-    id: number;
-    text: string;
-    timestamp: Date;
-    type: "sent" | "received" | "thinking";
-  }> = [];
+  isThinking: boolean = false;
 
+  @state()
+  arrayMessages: ArrayMessageInterface[] = [];
+
+  async connectedCallback() {
+    super.connectedCallback();
+    await this.loadMessage();
+  }
+
+  // <p>Bienvenido a ${this.welcomeName}!</p>
   render() {
     return html`
       <div
         class="chat-form ${this.isOpen ? "open" : ""}"
         @mousedown=${this._handleFormClick}
       >
-        <div class="welcome">
-          <p>Bienvenido a ${this.welcomeName}!</p>
-          <button class="about" title="About">❕</button>
+        <div class="welcome-container">
+          <div class="welcome">
+            <p>✨Bienvenido a ${this.welcomeName}</p>
+            <div class="action-container">
+              <button class="actions" title="new chat" @click=${this.onNewChat}>
+                🗨️
+              </button>
+              <button class="actions" title="About">❓</button>
+            </div>
+          </div>
         </div>
         <div class="board-message">
           <chat-messages
@@ -251,7 +298,12 @@ export class ChatForm extends LitElement {
             ></textarea>
             <button
               type="submit"
-              class="clear-button ${this.message.trim() ? "show" : ""}"
+              .disabled=${this.isThinking}
+              class="clear-button ${this.message.trim()
+                ? !this.isThinking
+                  ? "show"
+                  : "disable"
+                : ""}"
             >
               ↑
             </button>
@@ -304,6 +356,7 @@ export class ChatForm extends LitElement {
           type: "sent",
         },
       ];
+      this.isThinking = true;
       this.arrayMessages = [
         ...this.arrayMessages,
         {
@@ -331,16 +384,20 @@ export class ChatForm extends LitElement {
         .filter((msg) => msg.text !== "Pensando...")
         .concat({
           id: Date.now() + 2,
-          text:
-            res?.messages[0].content[0].text.value ??
-            "No pude procesar tu solicitud",
+          text: res?.messages[0].content[0].text.value
+            ? `✨ ${res.messages[0].content[0].text.value}`
+            : "✨ No pude procesar tu solicitud",
           timestamp: new Date(),
           type: "received",
         });
     }
+    this.isThinking = false;
   }
-  private async _handleSubmit(e: Event) {
+  private async _handleSubmit(e: SubmitEvent) {
     e.preventDefault();
+    if (this.isThinking) {
+      return;
+    }
     await this.sendChatAction();
   }
 
@@ -370,7 +427,43 @@ export class ChatForm extends LitElement {
   private async _handleKeyDown(e: KeyboardEvent) {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
+      if (this.isThinking) {
+        return;
+      }
       await this.sendChatAction();
     }
+  }
+
+  private loadMessage = async () => {
+    try {
+      //const regex = /Pregunta:\s*(.+)/;
+      //const resultado = texto.match(regex)[1];
+      let items: ArrayMessageInterface[] = [];
+      const thread = localStorage.getItem("idChat");
+      const ruta = `${this.apiLoadMessages}/${this.idConfig}/${thread}`;
+      const mjs = await loadConversation(ruta);
+
+      if (mjs) {
+        mjs.forEach((element) => {
+          items.push({
+            id: Date.now() + 1,
+            text: element.assistant_id
+              ? `✨ ${element.content[0].text.value}`
+              : element.content[0].text.value,
+            timestamp: new Date(),
+            type: element.assistant_id ? "received" : "sent",
+          });
+        });
+      }
+
+      this.arrayMessages = items;
+    } catch (error) {
+      this.arrayMessages = [];
+    }
+  };
+
+  private onNewChat() {
+    localStorage.removeItem("idChat");
+    this.arrayMessages = [];
   }
 }

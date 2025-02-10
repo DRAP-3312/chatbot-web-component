@@ -20,7 +20,7 @@ export class ChatContainer extends LitElement {
   @property({ type: Boolean })
   isOpen: boolean = false;
   @property({ type: String })
-  contentButton: string = "❉";
+  contentButton: string = "🌟";
   @property({ type: Boolean })
   chatModal: boolean = false;
   @property({ type: String })
@@ -69,6 +69,9 @@ export class ChatContainer extends LitElement {
   @property({ type: String })
   idConfig: string = "";
 
+  @property({type: String})
+  apiLoadMessages:string = ''
+
   render() {
     return html`
       <div class="container">
@@ -82,6 +85,7 @@ export class ChatContainer extends LitElement {
           @form-chat=${this.closeModalChat}
           .configFormStyle=${this.configFormStyle}
           .configMessageStyle=${this.configMessageStyle}
+          .apiLoadMessages=${this.apiLoadMessages}
         ></chat-form>
         <chat-button
           .configButtonStyle=${this.configButtonStyle}
