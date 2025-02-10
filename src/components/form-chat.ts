@@ -410,24 +410,24 @@ export class ChatForm extends LitElement {
     await this.sendChatAction();
   }
 
-  // private closeFormOutSide = (e: MouseEvent) => {
-  //   const chatForm = this.shadowRoot?.querySelector(
-  //     ".chat-form"
-  //   ) as HTMLElement;
-  //   if (chatForm && !chatForm.contains(e.target as Node)) {
-  //     this.dispatchEvent(new CustomEvent("form-chat"));
-  //   }
-  // };
+  private closeFormOutSide = (e: MouseEvent) => {
+    const chatForm = this.shadowRoot?.querySelector(
+      ".chat-form"
+    ) as HTMLElement;
+    if (chatForm && !chatForm.contains(e.target as Node)) {
+      this.dispatchEvent(new CustomEvent("form-chat"));
+    }
+  };
 
-  // updated(changedProperties: Map<string, any>) {
-  //   if (changedProperties.has("isOpen")) {
-  //     if (this.isOpen) {
-  //       document.addEventListener("mousedown", this.closeFormOutSide);
-  //     } else {
-  //       document.removeEventListener("mousedown", this.closeFormOutSide);
-  //     }
-  //   }
-  // }
+  updated(changedProperties: Map<string, any>) {
+    if (changedProperties.has("isOpen")) {
+      if (this.isOpen) {
+        document.addEventListener("mousedown", this.closeFormOutSide);
+      } else {
+        document.removeEventListener("mousedown", this.closeFormOutSide);
+      }
+    }
+  }
 
   private _handleFormClick(e: MouseEvent) {
     e.stopPropagation();

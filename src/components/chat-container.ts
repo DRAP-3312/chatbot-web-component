@@ -15,6 +15,14 @@ export class ChatContainer extends LitElement {
       bottom: 20px;
       z-index: 1000;
     }
+
+    .container-button {
+      text-align: center;
+    }
+
+    .container-button.close{
+      display: none;
+    }
   `;
 
   @property({ type: Boolean })
@@ -94,12 +102,14 @@ export class ChatContainer extends LitElement {
           .token=${this.tokenAuth}
           .baseURL=${this.baseURL}
         ></chat-form>
-        <chat-button
-          .configButtonStyle=${this.configButtonStyle}
-          .content=${this.contentButton}
-          @toggle-chat="${this.toggleChat}"
-        >
-        </chat-button>
+        <div class="container-button ${this.isOpen ? 'close': ''}">
+          <chat-button
+            .configButtonStyle=${this.configButtonStyle}
+            .content=${this.contentButton}
+            @toggle-chat="${this.toggleChat}"
+          >
+          </chat-button>
+        </div>
       </div>
     `;
   }
