@@ -247,6 +247,10 @@ export class ChatForm extends LitElement {
 
   @property({ type: String })
   apiLoadMessages: string = "";
+  @property({ type: String })
+  token: string = "";
+  @property({ type: String })
+  baseURL: string = "";
 
   @state()
   message: string = "";
@@ -330,7 +334,12 @@ export class ChatForm extends LitElement {
 
   private async onSendMessage(propms: SendMessageInt) {
     try {
-      const res = await sendMessage(this.pathStartChat, propms);
+      const res = await sendMessage(
+        this.baseURL,
+        this.token,
+        this.pathStartChat,
+        propms
+      );
       if (res) {
         localStorage.setItem("idChat", res.idThread);
         return res;
@@ -436,12 +445,10 @@ export class ChatForm extends LitElement {
 
   private loadMessage = async () => {
     try {
-      //const regex = /Pregunta:\s*(.+)/;
-      //const resultado = texto.match(regex)[1];
       let items: ArrayMessageInterface[] = [];
       const thread = localStorage.getItem("idChat");
       const ruta = `${this.apiLoadMessages}/${this.idConfig}/${thread}`;
-      const mjs = await loadConversation(ruta);
+      const mjs = await loadConversation(this.baseURL, ruta, this.token);
 
       if (mjs) {
         mjs.forEach((element) => {

@@ -31,6 +31,8 @@ export class ChatContainer extends LitElement {
   userName: string = "";
   @property({ type: String })
   welcomeName: string = "";
+  @property({ type: String })
+  tokenAuth: string = "";
 
   //config custom style form
   @property({ type: Object })
@@ -69,8 +71,11 @@ export class ChatContainer extends LitElement {
   @property({ type: String })
   idConfig: string = "";
 
-  @property({type: String})
-  apiLoadMessages:string = ''
+  @property({ type: String })
+  apiLoadMessages: string = "";
+
+  @property({ type: String })
+  baseURL: string = "";
 
   render() {
     return html`
@@ -86,6 +91,8 @@ export class ChatContainer extends LitElement {
           .configFormStyle=${this.configFormStyle}
           .configMessageStyle=${this.configMessageStyle}
           .apiLoadMessages=${this.apiLoadMessages}
+          .token=${this.tokenAuth}
+          .baseURL=${this.baseURL}
         ></chat-form>
         <chat-button
           .configButtonStyle=${this.configButtonStyle}

@@ -1,17 +1,15 @@
 import { LoadChatResponse } from "../interfaces/loadChat.response";
+import { createChatApi } from "./index";
 
-export const loadConversation = async (url: string) => {
+export const loadConversation = async (
+  baseURL: string,
+  url: string,
+  token: string
+) => {
   try {
-    const loadThread = await fetch(url, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    });
+    const req = createChatApi(baseURL, token);
+    const res = await req.get<LoadChatResponse[]>(url);
 
-    const data = await loadThread.json();
-
-    return data as unknown as LoadChatResponse[];
+    return res.data;
   } catch (error: any) {}
 };

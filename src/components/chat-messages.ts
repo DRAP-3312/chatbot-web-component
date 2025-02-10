@@ -168,13 +168,11 @@ export class ChatMessages extends LitElement {
       margin: 4px 0;
     }
 
-    /* Estilo para cuando la imagen está cargando */
     .message-content img.loading {
       background-color: #f0f0f0;
       min-height: 200px;
     }
 
-    /* Animación de carga suave */
     .message-content img {
       opacity: 0;
       transition: opacity 0.3s ease-in-out;
@@ -320,7 +318,7 @@ export class ChatMessages extends LitElement {
           return html`
             ${message.type === "thinking"
               ? html`<div class="containerLoad">
-                ✨
+                  ✨
                   <div class="loader"></div>
                 </div>`
               : html`
